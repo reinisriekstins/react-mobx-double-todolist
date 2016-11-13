@@ -82,7 +82,8 @@ class AddNavbarItem extends Component {
 @observer
 class Page extends Component {
   render() {
-    const store = this.props.store
+    const props = this.props
+    const store = props.store
 
     return (
       <div>
