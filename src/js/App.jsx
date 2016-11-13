@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
-//import logo from './logo.svg'
-import './App.css'
+import '../css/App.css'
 
 const MyNavItemList = props => {
 
@@ -119,8 +118,8 @@ class Page extends Component {
 
     this.state = {
       navItems: {
-        left: [],// [ 'one', 'two', 'three', 'four' ],
-        right: []// [ 'uno', 'dos', 'tres', 'quattro' ]
+        left: [],
+        right: []
       }
     }
   }
