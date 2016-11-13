@@ -103,6 +103,10 @@ module.exports = {
         test: /\.(js|jsx)$/,
         include: paths.appSrc,
         loader: 'babel',
+        query: {
+          presets: ['react', 'es2015'],
+          plugins: ['transform-decorators-legacy', 'transform-class-properties'],
+        }
         
       },
       // The notation here is somewhat confusing.

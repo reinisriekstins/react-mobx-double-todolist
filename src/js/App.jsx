@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
+import { observer } from 'mobx-react'
+
 import '../css/App.css'
 
 const MyNavItemList = props => {
-
   return (
     <ul>
       { 
@@ -16,6 +17,7 @@ const MyNavItemList = props => {
   )
 }
 
+@observer
 class Navbar extends Component {
   constructor(props) {
     super(props)
@@ -47,6 +49,7 @@ class Navbar extends Component {
   }
 }
 
+@observer
 class AddNavbarItem extends Component {
   constructor(props) {
     super(props)
@@ -112,6 +115,7 @@ class AddNavbarItem extends Component {
   }
 }
 
+@observer
 class Page extends Component {
   constructor() {
     super()
