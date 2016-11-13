@@ -3,113 +3,77 @@ import { observer } from 'mobx-react'
 
 import '../css/App.css'
 
-const MyNavItemList = props => {
+const ItemList = props => {
+  const store = props.store
+
+  const handleClick = e => {
+    let activeElem = e.target
+
+    store.activeElem && store.activeElem.setAttribute('style', '')
+
+    store.activeElem = activeElem
+    activeElem.setAttribute('style', 'color: red;')
+  }
+
+  const list = props.children.map(child => (
+    <li onClick={ handleClick } key={ child } > 
+      { child } 
+    </li>
+    )
+  )
+
   return (
-    <ul>
-      { 
-        props.children.map(child => (
-          <li onClick={ props.handleClick } key={ child } > 
-            { child } 
-          </li>
-        ))
-      }
-    </ul>
+    <ul> { list } </ul>
   )
 }
 
 @observer
-class Navbar extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = { activeElem: null }
-  }
-  handleClick(event) {
-    let activeElem = event.target 
-
-    this.setState((prevState, props) => {
-      prevState.activeElem && prevState.activeElem.setAttribute('style', '')
-
-      activeElem.setAttribute('style', 'color: red;')
-
-      return { activeElem }
-    })
-  }
-  render() {
-    return (
-      <nav className="navbar">
-        <MyNavItemList handleClick={ e => this.handleClick(e) } > 
-          { this.props.navItems.left }
-        </MyNavItemList>
-        <MyNavItemList handleClick={ e => this.handleClick(e) } > 
-          { this.props.navItems.right }
-        </MyNavItemList>
-      </nav>
-    )
-  }
-}
-
-@observer
 class AddNavbarItem extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      list: 1,
-      value: ''
-    }
-  }
-  handleInputChange(event) {
-    this.setState({ value: event.target.value })
-  }
-  handleBtnClick(event) {
-    const 
-      value = this.state.value,
-      list  = this.state.list
-
-    if ( value !== '' ) {
-      if ( list === 1 ) {
-        this.props.onNewItemAdded({ value, list: 'left' })
-        this.setState({ value: '' })
-      }
-      else {
-        this.props.onNewItemAdded({ value, list: 'right' })
-        this.setState({ value: '' })
-      }
-    }
-  }
-  handleKeyUp(event) {
-    const keyCode = (typeof event.which === 'number' ? event.which : event.keyCode)
-    keyCode === 13 && this.handleBtnClick( event )
-  }
   render() {
+    const store = this.props.store
+    let { inputVal, list } = store
+
+    const tryAddItem = () => {
+      if ( inputVal !== '' ) {
+        store[list].push(inputVal)
+        store.inputVal = ''
+      }
+    }
+
+    const handleInputChange = e => {
+      store.inputVal = e.target.value
+    }
+
+    const handleKeyUp = e => {
+      const keyCode = (typeof e.which === 'number' ? e.which : e.keyCode)
+      keyCode === 13 && tryAddItem()
+    }
+
     return (
       <div>
         <input 
           type="radio" 
-          name="radio" 
-          value="list1" 
-          onClick={ () => this.setState({ list: 1 }) }
+          name="radio"
+          onClick={ () => store.list = 'left' }
           selected
         />
-        List 1
+        Left list
         <input 
           type="radio" 
-          name="radio" 
-          value="list2"
-          onClick={ () => this.setState({ list: 2 }) }
+          name="radio"
+          onClick={ () => store.list = 'right' }
         /> 
-        List 2
+        Right list
         <br />
         <input 
           type="text" 
-          placeholder={ 'add item to list ' + this.state.list }
-          value={ this.state.value } 
-          onChange={ e => this.handleInputChange(e) }
-          onKeyUp={ e => this.handleKeyUp(e) }
+          placeholder={ `add item to ${ this.props.store.list } list` }
+          value={ inputVal } 
+          onChange={ handleInputChange }
+          onKeyUp={ handleKeyUp }
         />
         <br />
-        <button onClick={ e => this.handleBtnClick(e) } > Add item </button>
+        <button onClick={ tryAddItem } > Add item </button>
       </div>
     )
   }
@@ -117,30 +81,20 @@ class AddNavbarItem extends Component {
 
 @observer
 class Page extends Component {
-  constructor() {
-    super()
-
-    this.state = {
-      navItems: {
-        left: [],
-        right: []
-      }
-    }
-  }
-  handleNavItemChange(item) {
-    this.setState((prevState, props) => {
-
-      let newState = prevState
-      newState.navItems[item.list].push(item.value)
-
-      return newState
-    })
-  }
   render() {
+    const store = this.props.store
+
     return (
       <div>
-        <AddNavbarItem onNewItemAdded={ i => this.handleNavItemChange(i) } />
-        <Navbar navItems={ this.state.navItems } />
+        <AddNavbarItem store={ store } />
+        <nav className="navbar">
+          <ItemList store={ store } > 
+            { store.left }
+          </ItemList>
+          <ItemList store={ store } > 
+            { store.right }
+          </ItemList>
+        </nav>
       </div>
     )
   }

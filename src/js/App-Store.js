@@ -6,7 +6,7 @@ class AppStore {
 
   @observable activeElem = null
 
-  @observable list = 1
+  @observable list = 'left'
 
   @observable inputVal = ''
 }
