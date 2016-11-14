@@ -1,10 +1,10 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { observer } from 'mobx-react'
 
 import '../css/App.css'
 
-const ItemList = props => {
-  const store = props.store
+const ItemList = observer(props => {
+  const { store, children } = props
 
   const handleClick = e => {
     let activeElem = e.target
@@ -15,7 +15,7 @@ const ItemList = props => {
     activeElem.setAttribute('style', 'color: red;')
   }
 
-  const list = props.children.map(child => (
+  const list = children.map(child => (
     <li onClick={ handleClick } key={ child } > 
       { child } 
     </li>
@@ -25,80 +25,82 @@ const ItemList = props => {
   return (
     <ul> { list } </ul>
   )
-}
+})
 
-@observer
-class AddNavbarItem extends Component {
-  render() {
-    const store = this.props.store
-    let { inputVal, list } = store
+const AddNavbarItem = observer(props => {
+  const { store } = props
+  const { inputVal, list } = store
 
-    const tryAddItem = () => {
-      if ( inputVal !== '' ) {
-        store[list].push(inputVal)
-        store.inputVal = ''
-      }
+  const tryAddItem = () => {
+    if ( inputVal !== '' ) {
+      store[list].push(inputVal)
+      store.inputVal = ''
     }
-
-    const handleInputChange = e => {
-      store.inputVal = e.target.value
-    }
-
-    const handleKeyUp = e => {
-      const keyCode = (typeof e.which === 'number' ? e.which : e.keyCode)
-      keyCode === 13 && tryAddItem()
-    }
-
-    return (
-      <div>
-        <input 
-          type="radio" 
-          name="radio"
-          onClick={ () => store.list = 'left' }
-          selected
-        />
-        Left list
-        <input 
-          type="radio" 
-          name="radio"
-          onClick={ () => store.list = 'right' }
-        /> 
-        Right list
-        <br />
-        <input 
-          type="text" 
-          placeholder={ `add item to ${ this.props.store.list } list` }
-          value={ inputVal } 
-          onChange={ handleInputChange }
-          onKeyUp={ handleKeyUp }
-        />
-        <br />
-        <button onClick={ tryAddItem } > Add item </button>
-      </div>
-    )
   }
-}
 
-@observer
-class Page extends Component {
-  render() {
-    const props = this.props
-    const store = props.store
-
-    return (
-      <div>
-        <AddNavbarItem store={ store } />
-        <nav className="navbar">
-          <ItemList store={ store } > 
-            { store.left }
-          </ItemList>
-          <ItemList store={ store } > 
-            { store.right }
-          </ItemList>
-        </nav>
-      </div>
-    )
+  const handleInputChange = e => {
+    store.inputVal = e.target.value
   }
-}
+
+  const handleKeyUp = e => {
+    const keyCode = (typeof e.which === 'number' ? e.which : e.keyCode)
+    keyCode === 13 && tryAddItem()
+  }
+
+  const handleRadioClick = (side) => {
+    store.list = side
+
+    document.querySelector('#todo-input').focus()
+  }
+
+  return (
+    <div>
+      <input
+        id="radio-left"
+        type="radio" 
+        name="radio"
+        onClick={ () => handleRadioClick('left') }
+        selected
+      />
+      <label htmlFor="radio-left">Left list</label>
+      <input
+        id="radio-right"
+        type="radio" 
+        name="radio"
+        onClick={ () => handleRadioClick('right') }
+      /> 
+      <label htmlFor="radio-right">Right list</label>
+      <br />
+      <input
+        id="todo-input"
+        type="text" 
+        placeholder={ `add item to ${ store.list } list` }
+        value={ inputVal } 
+        onChange={ handleInputChange }
+        onKeyUp={ handleKeyUp }
+      />
+      <br />
+      <button onClick={ tryAddItem } > Add item </button>
+    </div>
+  )
+})
+
+const Page = observer(props => {
+  const { store } = props
+
+  return (
+    <div>
+      <AddNavbarItem store={ store } />
+      <nav className="navbar">
+        <ItemList store={ store } > 
+          { store.left }
+        </ItemList>
+        <ItemList store={ store } > 
+          { store.right }
+        </ItemList>
+      </nav>
+    </div>
+  )
+})
 
 export default Page;
