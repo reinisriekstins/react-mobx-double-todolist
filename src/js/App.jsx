@@ -16,8 +16,8 @@ const ItemList = observer(props => {
   }
 
   const list = children.map(child => (
-    <li onClick={ handleClick } key={ child } > 
-      { child } 
+    <li onClick={ handleClick } key={ child } >
+      { child }
     </li>
     )
   )
@@ -47,8 +47,12 @@ const AddNavbarItem = observer(props => {
     keyCode === 13 && tryAddItem()
   }
 
-  const handleRadioClick = (side) => {
-    store.list = side
+  const handleRadioClick = e => {
+    let id = e.target.id
+
+    if ( id.endsWith('left') ) store.list = 'left'
+    else if ( id.endsWith('right') ) store.list = 'right'
+    else throw new Error('Incorrect radio button id')
 
     document.querySelector('#todo-input').focus()
   }
@@ -57,25 +61,24 @@ const AddNavbarItem = observer(props => {
     <div>
       <input
         id="radio-left"
-        type="radio" 
+        type="radio"
         name="radio"
-        onClick={ () => handleRadioClick('left') }
-        selected
+        onClick={ handleRadioClick }
       />
       <label htmlFor="radio-left">Left list</label>
       <input
         id="radio-right"
-        type="radio" 
+        type="radio"
         name="radio"
-        onClick={ () => handleRadioClick('right') }
-      /> 
+        onClick={ handleRadioClick }
+      />
       <label htmlFor="radio-right">Right list</label>
       <br />
       <input
         id="todo-input"
-        type="text" 
+        type="text"
         placeholder={ `add item to ${ store.list } list` }
-        value={ inputVal } 
+        value={ inputVal }
         onChange={ handleInputChange }
         onKeyUp={ handleKeyUp }
       />
@@ -92,10 +95,10 @@ const Page = observer(props => {
     <div>
       <AddNavbarItem store={ store } />
       <nav className="navbar">
-        <ItemList store={ store } > 
+        <ItemList store={ store } >
           { store.left }
         </ItemList>
-        <ItemList store={ store } > 
+        <ItemList store={ store } >
           { store.right }
         </ItemList>
       </nav>
