@@ -3,27 +3,44 @@ import { observer } from 'mobx-react'
 
 import '../css/App.css'
 
+const Item = observer(props => {
+  const { store, children, child } = props
+
+  const style = (() => {
+    if ( store.activeElem && child === store.activeElem)
+      return { color: 'red' }
+    return {}
+  })()
+
+  const handleClick = e => {
+    console.log(child)
+  }
+
+  return (
+    <li
+      onClick={ e => store.activeElem = e.target.innerText }
+      style={ style } >
+      { children }
+    </li>
+  )
+})
+
 const ItemList = observer(props => {
   const { store, children } = props
 
-  const handleClick = e => {
-    let activeElem = e.target
-
-    store.activeElem && store.activeElem.setAttribute('style', '')
-
-    store.activeElem = activeElem
-    activeElem.setAttribute('style', 'color: red;')
-  }
-
-  const list = children.map(child => (
-    <li onClick={ handleClick } key={ child } >
-      { child }
-    </li>
-    )
-  )
-
   return (
-    <ul> { list } </ul>
+    <ul>
+    {
+      children.map((child, i) => (
+        <Item
+          key={ child }
+          store={ store }
+          child={ child } >
+          { child }
+        </Item>
+      ))
+    }
+    </ul>
   )
 })
 
@@ -88,12 +105,39 @@ const AddNavbarItem = observer(props => {
   )
 })
 
+const RemoveItem = observer(props => {
+  const { store } = props
+  const { left, right } = store
+
+  const handleClick = e => {
+    const
+      leftIncludes = left.includes(store.activeElem),
+      rightIncludes = right.includes(store.activeElem)
+
+    if ( leftIncludes )
+      left.splice(left.indexOf(store.activeElem), 1)
+
+    if ( rightIncludes )
+      right.splice(right.indexOf(store.activeElem), 1)
+
+    if ( leftIncludes || rightIncludes )
+      store.activeElem = null
+  }
+
+  return (
+    <button onClick={ handleClick }>
+      Remove Item
+    </button>
+  )
+})
+
 const Page = observer(props => {
   const { store } = props
 
   return (
     <div>
       <AddNavbarItem store={ store } />
+      <RemoveItem store={ store } />
       <nav className="navbar">
         <ItemList store={ store } >
           { store.left }
